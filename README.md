@@ -6,4 +6,4 @@ NPM Continuous Integration check action
 - kt-actions/npm-run-script
   - setup node environment (kt-actions/setup-node-minmax, use cache)
   - install dependencies or restore from cache (uses cache)
-  - run checks
+  - run checks (default: `npm run check && npm run lint`)
