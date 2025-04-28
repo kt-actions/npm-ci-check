@@ -1,11 +1,32 @@
-name: Template
-description: 'Template for creating new actions'
+name: NPM CI Check
+description: NPM Continuous Integration check action
 
 inputs:
-  name:
-    description: 'Your name'
-    required: true
-    default: 'World'
+  node-version:
+    description: 'Version Spec to use. Examples: 18, 18.x, 18.0.0, 18.0.x, 18.0.0-x, 18.0.0-x64.'
+    required: false
+  matrix-node-version:
+    description: 'Version Spec array, i.e. from matrix.node-version. Latest will be selected from this array and setup-node will be run with the selected version.'
+    required: false
+  matrix-node-version-earliest:
+    description: 'Set this option if you want the action to select for the earliest available version that satisfies the version spec.'
+    default: 'false'
+  install-script:
+    description: 'Bash script to run after setting up Node.js.'
+    default: 'npm ci'
+  run-script:
+    description: 'Bash script to run after setting up Node.js.'
+    default: |
+      npm run check
+      npm run lint
+  cache-additional-path:
+    description: 'Additional paths to cache. This is a multi-line list of paths.'
+  cache-reset:
+    description: 'Delete the cache if it exists to cache the new one.'
+    default: 'false'
+  working-directory:
+    description: 'The working directory which contains the **/package-lock.json files'
+    default: '.'
 
 outputs:
   greeting:
@@ -15,6 +36,19 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - uses: actions/checkout@v4
+
+    - uses: kt-actions/setup-node-minmax@v1
+      with:
+        node-version: ${{ inputs.node-version }}
+        matrix-node-version: ${{ inputs.matrix-node-version }}
+        matrix-node-version-earliest: ${{ inputs.matrix-node-version-earliest }}
+        install-script: ${{ inputs.install-script }}
+        run-script: ${{ inputs.run-script }}
+        cache-additional-path: ${{ inputs.cache-additional-path }}
+        cache-reset: ${{ inputs.cache-reset }}
+        working-directory: ${{ inputs.working-directory }}
+
     - id: echo
       run: ${{ tojson(inputs) }}
       shell: cat {0}
