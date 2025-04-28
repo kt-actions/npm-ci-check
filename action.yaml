@@ -28,17 +28,12 @@ inputs:
     description: 'The working directory which contains the **/package-lock.json files'
     default: '.'
 
-outputs:
-  greeting:
-    description: 'The greeting message'
-    value: ${{ steps.hello.outputs.message }}
-
 runs:
   using: 'composite'
   steps:
     - uses: actions/checkout@v4
 
-    - uses: kt-actions/setup-node-minmax@v1
+    - uses: kt-actions/npm-run-script@v1
       with:
         node-version: ${{ inputs.node-version }}
         matrix-node-version: ${{ inputs.matrix-node-version }}
@@ -48,14 +43,3 @@ runs:
         cache-additional-path: ${{ inputs.cache-additional-path }}
         cache-reset: ${{ inputs.cache-reset }}
         working-directory: ${{ inputs.working-directory }}
-
-    - id: echo
-      run: ${{ tojson(inputs) }}
-      shell: cat {0}
-
-    - run: echo "message='Hello ${{ inputs.name }}'" >> "$GITHUB_OUTPUT"
-      shell: bash
-      id: hello
-
-    - run: echo "Hello ${{ steps.hello.outputs.message }}"
-      shell: bash
